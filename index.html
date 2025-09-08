@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Redação IA</title>
+<style>
+body { font-family: Arial; text-align:center; padding:20px; background:#f5f5f5; }
+.container { background:#fff; padding:20px; border-radius:10px; max-width:600px; margin:auto; }
+input, button { padding:10px; margin:10px; width:90%; font-size:16px; }
+#resultado { margin-top:20px; text-align:left; white-space: pre-wrap; border-top:1px solid #ccc; padding-top:10px; }
+button:disabled { opacity:0.6; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Gerador de Redação com IA</h1>
+<input type="text" id="temaInput" placeholder="Digite o tema da redação">
+<button onclick="gerarRedacao()">Gerar Redação</button>
+<div id="resultado"></div>
+</div>
+
+<script>
+async function gerarRedacao() {
+    const tema = document.getElementById('temaInput').value.trim();
+        if (!tema) return alert('Digite um tema!');
+
+            const resultadoDiv = document.getElementById('resultado');
+                const button = document.querySelector('button');
+                    button.disabled = true;
+                        resultadoDiv.textContent = 'Gerando redação...';
+
+                            // Sua chave OpenAI (uso LOCAL apenas)
+                                const apiKey = "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";
+
+                                    try {
+                                            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                                                        method: 'POST',
+                                                                    headers: {
+                                                                                    'Content-Type': 'application/json',
+                                                                                                    'Authorization': `Bearer ${apiKey}`
+                                                                                                                },
+                                                                                                                            body: JSON.stringify({
+                                                                                                                                            model: 'gpt-4',
+                                                                                                                                                            messages: [{ role: 'user', content: `Escreva uma redação sobre: ${tema}` }],
+                                                                                                                                                                            max_tokens: 500
+                                                                                                                                                                                        })
+                                                                                                                                                                                                });
+
+                                                                                                                                                                                                        const data = await response.json();
+                                                                                                                                                                                                                if (data.choices && data.choices[0].message) {
+                                                                                                                                                                                                                            resultadoDiv.textContent = data.choices[0].message.content;
+                                                                                                                                                                                                                                    } else {
+                                                                                                                                                                                                                                                resultadoDiv.textContent = 'Erro ao gerar redação.';
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                            } catch (err) {
+                                                                                                                                                                                                                                                                    resultadoDiv.textContent = 'Erro ao gerar redação.';
+                                                                                                                                                                                                                                                                            console.error(err);
+                                                                                                                                                                                                                                                                                } finally {
+                                                                                                                                                                                                                                                                                        button.disabled = false;
+                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                            </script>
+                                                                                                                                                                                                                                                                                            </body>
+                                                                                                                                                                                                                                                                                            </html>
