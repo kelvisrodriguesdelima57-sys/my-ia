@@ -3,43 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My IA — Assistente Pessoal</title>
+<title>My IA</title>
 <style>
-  body { margin:0; padding:0; font-family:'Inter',sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; }
-  #app { width:360px; max-width:90%; background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.15); display:flex; flex-direction:column; overflow:hidden; }
-  header { background:#1db954; color:white; text-align:center; padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; }
-  header h1 { margin:0; font-weight:800; font-size:1.8rem; }
-  header p { margin:0.3rem 0 0; font-weight:400; font-size:0.95rem; opacity:0.9; }
-  #chat-window { flex:1; padding:1rem; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; }
-  .message { padding:0.6rem 1rem; border-radius:16px; max-width:80%; word-wrap:break-word; }
-  .message.bot { background:#e0e0e0; align-self:flex-start; }
-  .message.user { background:#1db954; color:white; align-self:flex-end; }
-  #input-area { display:flex; border-top:1px solid #ddd; }
-  #input-area input { flex:1; padding:0.8rem; border:none; outline:none; font-size:0.95rem; }
-  #input-area button { background:#1db954; color:white; border:none; padding:0 1rem; cursor:pointer; font-weight:600; }
+body{margin:0;padding:0;font-family:sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;height:100vh;}
+#app{width:360px;background:#fff;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+header{background:#1db954;color:#fff;text-align:center;padding:1rem;}
+#chat-window{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;}
+.message{padding:0.5rem 1rem;border-radius:16px;max-width:80%;word-wrap:break-word;}
+.message.bot{background:#e0e0e0;align-self:flex-start;}
+.message.user{background:#1db954;color:#fff;align-self:flex-end;}
+#input-area{display:flex;border-top:1px solid #ddd;}
+#input-area input{flex:1;padding:0.8rem;border:none;outline:none;}
+#input-area button{background:#1db954;color:white;border:none;padding:0 1rem;cursor:pointer;}
 </style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <h1>My IA</h1>
-    <p>Seu assistente pessoal de IA</p>
-  </header>
-  <main>
-    <div id="chat-window">
-      <div class="message bot">Olá! Estou pronto para ajudá-lo.</div>
-    </div>
-    <div id="input-area">
-      <input type="text" id="user-input" placeholder="Digite sua mensagem..." />
-      <button id="send-btn">Enviar</button>
-    </div>
-  </main>
+<header>
+<h1>My IA</h1>
+</header>
+<div id="chat-window">
+<div class="message bot">Olá! Estou pronto para ajudá-lo.</div>
 </div>
-
+<div id="input-area">
+<input type="text" id="user-input" placeholder="Digite sua mensagem...">
+<button id="send-btn">Enviar</button>
+</div>
+</div>
 <script>
 const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+
+async function askMetaIA(userText) {
+  const response = await fetch('http://localhost:3000/ask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: userText })
+  });
+  const data = await response.json();
+  return data.answer;
+}
 
 function addMessage(text, type) {
   const msg = document.createElement('div');
@@ -49,51 +53,19 @@ function addMessage(text, type) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-async function askMetaIA(userText) {
-  try {
-    const response = await fetch('http://localhost:3000/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: userText })
-    });
-    const data = await response.json();
-    return data.answer;
-  } catch {
-    return "Erro ao conectar com a IA.";
-  }
-}
-
-function botReply(userText, answer) {
-  const botMsg = document.createElement('div');
-  botMsg.classList.add('message', 'bot');
-  botMsg.textContent = "";
-  chatWindow.appendChild(botMsg);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-
-  let i = 0;
-  const interval = setInterval(() => {
-    botMsg.textContent += answer.charAt(i);
-    i++;
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-    if (i >= answer.length) clearInterval(interval);
-  }, 30);
-}
-
 sendBtn.addEventListener('click', async () => {
   const text = userInput.value.trim();
   if (!text) return;
   addMessage(text, 'user');
   userInput.value = '';
-
   addMessage("Digitando...", 'bot');
   const botMsg = chatWindow.querySelector('.message.bot:last-child');
-  
   const answer = await askMetaIA(text);
   botMsg.remove();
-  botReply(text, answer);
+  addMessage(answer, 'bot');
 });
 
-userInput.addEventListener('keypress', (e) => {
+userInput.addEventListener('keypress', e => {
   if (e.key === 'Enter') sendBtn.click();
 });
 </script>
