@@ -109,7 +109,7 @@
     </header>
     <main>
       <div id="chat-window">
-        <div class="message bot">Olá! Eu sou o My IA clonado. Pergunte algo!</div>
+        <div class="message bot">Olá! Estou pronto para ajudá-lo. Pergunte algo!</div>
       </div>
       <div id="input-area">
         <input type="text" id="user-input" placeholder="Digite sua mensagem..." />
@@ -137,7 +137,7 @@
       addMessage(text, 'user');
       userInput.value = '';
       setTimeout(() => {
-        addMessage(`Você disse: "${text}". Eu sou o My IA e estou aqui para ajudar!`, 'bot');
+        addMessage(`Você disse: "${text}". Estou aqui para ajudá-lo!`, 'bot');
       }, 500);
     });
 
