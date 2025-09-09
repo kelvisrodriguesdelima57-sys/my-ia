@@ -1,118 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Site em Manutenção</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1a1a1a, #2e2e2e);
-      animation: backgroundShift 15s ease-in-out infinite alternate;
-      color: #fff;
-      text-align: center;
-    }
-
-    @keyframes backgroundShift {
-      0% { background: #1a1a1a; }
-      50% { background: #2a2a2a; }
-      100% { background: #1a1a1a; }
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .alert-icon {
-      width: 100px;
-      animation: blink 1.2s infinite;
-    }
-
-    @keyframes blink {
-      0%, 50%, 100% { opacity: 1; transform: scale(1); }
-      25%, 75% { opacity: 0.7; transform: scale(1.05); }
-    }
-
-    .notice-text {
-      font-size: 28px;
-      font-weight: bold;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-    }
-
-    .highlight {
-      color: #ff4c4c;
-    }
-
-    .notice-subtext {
-      font-size: 18px;
-      color: #ccc;
-      margin-top: 5px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
-
-    .gear-container {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin-top: 30px;
-    }
-
-    .gear {
-      position: absolute;
-      width: 60px;
-    }
-
-    .gear1 {
-      top: 0;
-      left: 0;
-      animation: rotateClock 5s linear infinite;
-    }
-
-    .gear2 {
-      bottom: 0;
-      right: 0;
-      animation: rotateCounter 5s linear infinite;
-    }
-
-    @keyframes rotateClock {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes rotateCounter {
-      from { transform: rotate(360deg); }
-      to { transform: rotate(0deg); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Busca Chat</title>
+<style>
+body{margin:0;padding:0;font-family:sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;height:100vh;}
+#app{width:400px;background:#fff;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+header{background:#1db954;color:#fff;text-align:center;padding:1rem;}
+#chat-window{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;}
+.message{padding:0.5rem 1rem;border-radius:16px;max-width:80%;word-wrap:break-word;}
+.message.bot{background:#e0e0e0;align-self:flex-start;}
+.message.user{background:#1db954;color:#fff;align-self:flex-end;}
+#input-area{display:flex;border-top:1px solid #ddd;}
+#input-area input{flex:1;padding:0.8rem;border:none;outline:none;}
+#input-area button{background:#1db954;color:white;border:none;padding:0 1rem;cursor:pointer;}
+</style>
 </head>
 <body>
-  <div class="container">
-    <img class="alert-icon" src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Alerta" />
-    <div class="notice-text">
-      SITE EM <span class="highlight">MANUTENÇÃO</span>
-    </div>
-    <div class="notice-subtext">
-      Estamos ajustando algumas coisas para você.<br>
-      Volte daqui a pouco!
-    </div>
-    <div class="gear-container">
-      <img class="gear gear1" src="https://cdn-icons-png.flaticon.com/512/1548/1548700.png" alt="Engrenagem 1" />
-      <img class="gear gear2" src="https://cdn-icons-png.flaticon.com/512/1548/1548700.png" alt="Engrenagem 2" />
-    </div>
-  </div>
+<div id="app">
+<header><h1>Busca Chat</h1></header>
+<div id="chat-window">
+<div class="message bot">Olá! Pergunte algo que eu buscarei para você.</div>
+</div>
+<div id="input-area">
+<input type="text" id="user-input" placeholder="Digite sua pergunta...">
+<button id="send-btn">Buscar</button>
+</div>
+</div>
+
+<script>
+const chatWindow = document.getElementById('chat-window');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+
+async function searchQuery(query) {
+  const response = await fetch('http://localhost:3000/search', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ query })
+  });
+  const data = await response.json();
+  return data.answer;
+}
+
+function addMessage(text, type){
+  const msg = document.createElement('div');
+  msg.classList.add('message', type);
+  msg.textContent = text;
+  chatWindow.appendChild(msg);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+sendBtn.addEventListener('click', async () => {
+  const text = userInput.value.trim();
+  if(!text) return;
+  addMessage(text,'user');
+  userInput.value='';
+  addMessage("Buscando...",'bot');
+  const botMsg = chatWindow.querySelector('.message.bot:last-child');
+  const answer = await searchQuery(text);
+  botMsg.remove();
+  addMessage(answer,'bot');
+});
+
+userInput.addEventListener('keypress', e => {
+  if(e.key==='Enter') sendBtn.click();
+});
+</script>
 </body>
 </html>
