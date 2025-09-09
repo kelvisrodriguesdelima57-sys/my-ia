@@ -11,11 +11,9 @@ app.post('/search', async (req, res) => {
   try {
     const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_redirect=1&skip_disambig=1`);
     const data = await response.json();
-
-    // Pegando a resposta relevante
     const answer = data.AbstractText || data.RelatedTopics[0]?.Text || "Nenhuma resposta encontrada.";
     res.json({ answer });
-  } catch (error) {
+  } catch (err) {
     res.json({ answer: "Erro ao buscar a resposta." });
   }
 });
