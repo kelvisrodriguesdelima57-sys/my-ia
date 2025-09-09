@@ -1,89 +1,149 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demonstração de Amor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex">
+  <title>My IA — Your Personal AI Assistant</title>
   <style>
     body {
       margin: 0;
       padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #app {
+      width: 360px;
+      max-width: 90%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      background: #1db954;
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: #ffe6e6;
-      font-family: 'Arial', sans-serif;
-      overflow: hidden;
     }
 
-    h1 {
-      color: #e60073;
-      text-align: center;
-      font-size: 3rem;
-      margin-bottom: 20px;
-      animation: pulse 1s infinite;
+    header h1 {
+      margin: 0;
+      font-weight: 800;
+      font-size: 1.8rem;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+    header p {
+      margin: 0.3rem 0 0;
+      font-weight: 400;
+      font-size: 0.95rem;
+      opacity: 0.9;
     }
 
-    .heart {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background-color: #e60073;
-      transform: rotate(-45deg);
-      animation: floatUp 5s linear infinite;
+    #chat-window {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .heart::before,
-    .heart::after {
-      content: "";
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background-color: #e60073;
-      border-radius: 50%;
+    .message {
+      padding: 0.6rem 1rem;
+      border-radius: 16px;
+      max-width: 80%;
     }
 
-    .heart::before {
-      top: -25px;
-      left: 0;
+    .message.bot {
+      background: #e0e0e0;
+      align-self: flex-start;
     }
 
-    .heart::after {
-      top: 0;
-      left: 25px;
+    .message.user {
+      background: #1db954;
+      color: white;
+      align-self: flex-end;
     }
 
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(-45deg); opacity: 1; }
-      100% { transform: translateY(-800px) rotate(-45deg); opacity: 0; }
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #input-area input {
+      flex: 1;
+      padding: 0.8rem;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    #input-area button {
+      background: #1db954;
+      color: white;
+      border: none;
+      padding: 0 1rem;
+      cursor: pointer;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <h1>Te amoo sempre, minha bibizinha ❤️</h1>
+  <div id="app">
+    <header>
+      <h1>My IA</h1>
+      <p>Your Personal AI Assistant</p>
+    </header>
+    <main>
+      <div id="chat-window">
+        <div class="message bot">Olá! Eu sou o My IA clonado. Pergunte algo!</div>
+      </div>
+      <div id="input-area">
+        <input type="text" id="user-input" placeholder="Digite sua mensagem..." />
+        <button id="send-btn">Enviar</button>
+      </div>
+    </main>
+  </div>
 
   <script>
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = Math.random() * window.innerWidth + 'px';
-      heart.style.animationDuration = 3 + Math.random() * 3 + 's';
-      document.body.appendChild(heart);
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
-      setTimeout(() => {
-        heart.remove();
-      }, 6000);
+    function addMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', type);
+      msg.textContent = text;
+      chatWindow.appendChild(msg);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    setInterval(createHeart, 500);
+    sendBtn.addEventListener('click', () => {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addMessage(text, 'user');
+      userInput.value = '';
+      setTimeout(() => {
+        addMessage(`Você disse: "${text}". Eu sou o My IA e estou aqui para ajudar!`, 'bot');
+      }, 500);
+    });
+
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
   </script>
 </body>
 </html>
